@@ -26,3 +26,6 @@ docker run -d --rm \
     --name hackerton-backend \
     ${image_name}
 ```
+
+
+uvicorn app.main:app --reload

@@ -3,34 +3,41 @@
   import Navbar from '../../components/Navbar.svelte';
   import '@fortawesome/fontawesome-free/css/all.css';
 
-  let userId = '6695199d04cbd3e40f64419a'; // 필요시 실제 유저 ID로 설정
+  let userId = '669a2c8a92b008ad02bc3sfdjkls'; // 필요시 실제 유저 ID로 설정
+
   let title = '';
   let description = '';
   
   let qualificationsRequired = {
-    ageMin: '',
-    ageMax: '',
-    gender: '',
+    ageMin: 0,
+    ageMax: 0,
+    gender: 0,
     customQualification: {
-          affiliation: '',
-          career:''
-        }
+      additionalProp1: '',
+      additionalProp2: '',
+      additionalProp3: ''
+    }
   };
-    
+
   let coverLetterQuestions = [];
 
-  let content = '';
-  let charLimit = '';
-
   function addQuestion() {
-    coverLetterQuestions = [...coverLetterQuestions, { content: '', charLimit: 500 }];
+    const index = coverLetterQuestions.length;
+    coverLetterQuestions = [...coverLetterQuestions, { coverLetterQuestionId: index, content: '', charLimit: 500 }];
+    // console.log('coverletter ',coverLetterQuestions);
+  }
+  function removeQuestion(index) {
+    coverLetterQuestions = coverLetterQuestions.filter((_, i) => i !== index);
+    // Reassign IDs
+    coverLetterQuestions = coverLetterQuestions.map((question, i) => ({ ...question, coverLetterQuestionId: i }));
   }
 
   let alertMessage = '';
 
   async function handleJobPosting() {
-    const timestamp = new Date().toISOString();
 
+    const timestamp = new Date().toISOString();
+    console.log(coverLetterQuestions)
     const jobPostingData = {
       userId,
       title,
@@ -40,14 +47,13 @@
       createdAt: timestamp,
       updatedAt: timestamp
     };
-    
 
     try {
       const response = await fetch('http://localhost:8000/job_posting/create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-      },
+        },
         body: JSON.stringify(jobPostingData)
       });
 
@@ -57,12 +63,13 @@
         title = '';
         description = '';
         qualificationsRequired = {
-          ageMin: '',
-          ageMax: '',
-          gender: '',
+          ageMin: 0,
+          ageMax: 0,
+          gender: 0,
           customQualification: {
-            affiliation: '',
-            career: ''
+            additionalProp1: '',
+            additionalProp2: '',
+            additionalProp3: ''
           }
         };
         coverLetterQuestions = [];
@@ -79,7 +86,6 @@
       alertMessage = `작성 실패: 서버 오류 - ${error.message}`;
     }
   }
-
 </script>
 
 <Navbar />
@@ -98,7 +104,6 @@
     <textarea bind:value={description} required></textarea>
 
     <fieldset>
-      <!-- <legend>자격 요건</legend> -->
       <label>최소 나이:</label>
       <input type="number" bind:value={qualificationsRequired.ageMin} required />
 
@@ -113,10 +118,11 @@
       </select>
 
       <label>학력</label>
-      <input type="text" bind:value={qualificationsRequired.customQualification.affiliation} required />
-
+      <input type="text" bind:value={qualificationsRequired.customQualification.additionalProp1} required />
+      <label>자격증</label>
+      <input type="text" bind:value={qualificationsRequired.customQualification.additionalProp2} required />
       <label>경력</label>
-      <input type="text" bind:value={qualificationsRequired.customQualification.career} required />
+      <input type="text" bind:value={qualificationsRequired.customQualification.additionalProp3} required />
     </fieldset>
 
     <fieldset>
@@ -133,10 +139,13 @@
       <br>
       <button type="button" on:click={addQuestion}>질문 추가</button>
     </fieldset>
+
     <br><br>
     <button type="submit">작성</button>
   </form>
 </main>
+
+
 <style>
 .container {
     max-width: 800px;

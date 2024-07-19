@@ -3,34 +3,36 @@
   import { writable } from 'svelte/store';
   import { isLoggedIn, user, userType } from '../lib/store';
 
-  let userid = '';
+  let username = '';
   let password = '';
+  let usergroup;
 
   async function login(event) {
-    event.preventDefault();
-    const response = await fetch('http://localhost:8000/user/get/${userid}', {
+    event.preventDefault(username);
+    const response = await fetch(`http://localhost:8000/user/get/${username}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        '_id': userid,
+        'username': username,
         'password': password,
       }),
     });
 
     if (response.ok) {
       const data = await response.json();
+      usergroup = data.userGroup
 
       isLoggedIn.set(true);
-      user.set({ userid });
-      userType.set(userGroup);
+      user.set({ username });
+      userType.set(usergroup);
       localStorage.setItem('token', data.access_token);
 
       alert('Login successful');
-      if (userGroup === '1') {
+      if (usergroup === '1') {
         navigate('/home', { replace: true });
-      } else if (userGroup === '2') {
+      } else if (usergroup === '2') {
         navigate('/home', { replace: true });
       } else {
         navigate('/', { replace: true });
@@ -151,7 +153,7 @@
         <div class="input-wrapper">
           <label for="Password-4" class="input-label">아이디</label>
           <input class="input" maxlength="256" 
-                 type="text" bind:value={userid} required />
+                 type="text" bind:value={username} required />
         </div>
         <div class="input-wrapper">
           <label for="Password-4" class="input-label">비밀번호</label>

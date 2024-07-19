@@ -44,13 +44,16 @@
       };
 
       try {
-          const response = await fetch('http://localhost:8000/profile/create/', {
+          const response = await fetch('http://localhost:8000/profile/save/', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
               },
               body: JSON.stringify(profileData)
           });
+
+          console.log(profileData);
+
           if (response.ok) {
               alertMessage = '프로필이 성공적으로 작성되었습니다.';
               // Clear form fields
@@ -96,9 +99,9 @@
         </label>
 
         <div class="radio-group">
-          <label>남자<input type="radio" name="gender" value="male" on:change={handleRadioChange} />
+          <label>남자<input type="radio" name="gender" value=1 on:change={handleRadioChange} />
           </label>
-          <label>여자<input type="radio" name="gender" value="female" on:change={handleRadioChange} />
+          <label>여자<input type="radio" name="gender" value=0 on:change={handleRadioChange} />
           </label>
         </div>
 

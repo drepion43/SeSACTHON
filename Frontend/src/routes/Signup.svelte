@@ -12,6 +12,7 @@
   
     async function signup(event) {
       event.preventDefault();
+      const timestamp = new Date().toISOString();
 
       // integer로 변경
       const userGroupInt = parseInt(usergroup, 10);
@@ -27,7 +28,9 @@
           userGroup: usergroup,
           username: username,
           password: password,
-          affiliation: affiliation
+          affiliation: affiliation,
+          createdAt:  timestamp,
+          updatedAt: timestamp
         }),
 
       });
