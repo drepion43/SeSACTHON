@@ -8,8 +8,11 @@
     import JobPost from './routes/jobpost/JobPost.svelte';
     import JobDetail from './routes/jobpost/JobDetail.svelte';
     import UserProfile from './routes/UserProfile.svelte';
-    import ApplyJob from './routes/jobpost/ApplyJob.svelte';
+    import ApplyJob from './routes/applicant/ApplyJob.svelte';
     import MyJobPostList from'./routes/jobpost/MyJobPostList.svelte'
+
+    import MyResume from'./routes/applicant/MyResume.svelte'
+
     import { isLoggedIn, userType } from './lib/store';
 
 
@@ -51,17 +54,16 @@
     <Route path="/signup" component={Signup} />
     {#if loggedIn}
         <Route path="/home" component={Home} />
+
         <Route path="/jobpostlist" component={JobPostList} />
         <Route path="/jobdetail/:id" component={JobDetail} />
-
         <Route path="/myjobpostlist" component={MyJobPostList} />
-        <!-- {#if currentUserType === "1"} -->
-            <Route path="/jobpost" component={JobPost} />
-        <!-- {/if} -->
-        <!-- {#if currentUserType === "2"} -->
-            <Route path="/profile" component={UserProfile} />
-        <!-- {/if} -->
+        <Route path="/jobpost" component={JobPost} />
+
+        
+        <Route path="/profile" component={UserProfile} />
         <Route path="/applyjob/:id" component={ApplyJob} />
+        <Route path="/myresume" component={MyResume} />
     {/if}
 
 </Router>

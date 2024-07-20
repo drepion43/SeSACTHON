@@ -48,7 +48,6 @@
       additionalProp1 = job.qualificationsRequired.customQualification.additionalProp1;
       additionalProp2 = job.qualificationsRequired.customQualification.additionalProp2;
       additionalProp3 = job.qualificationsRequired.customQualification.additionalProp3;
-
       console.log('job title',title);
 
     } catch (err) {
@@ -92,11 +91,11 @@
       <p><strong>자격증 : </strong> {additionalProp1}, {additionalProp2}, {additionalProp3}</p>
       <p><strong>작성일 : </strong> {createdAt}</p>
 
-      <!-- {#if currentUserType=="2"} -->
+      {#if currentUserType=="2"}
         <div class="apply-btn-container">
           <button class="apply-btn" on:click={() => applyJob()}>지원하기</button>
         </div>
-      <!-- {/if} -->
+      {/if}
     </div>
   {/if}
 </main>

@@ -42,9 +42,10 @@
   }
     function filterJobs() {
       const query = searchQuery.toLowerCase();
-  
+      
       filteredJobListings = jobListings.filter(job => {
       const matchesQuery = job.title.toLowerCase().includes(query) || job.description.toLowerCase().includes(query);
+      console.log(`Job userID: ${job.userID}, job title : ${job.title}`);
       return matchesQuery;
       });
     }
@@ -70,7 +71,7 @@
   <div class="search-filter">
     <input type="text" placeholder="검색어 입력" bind:value={searchQuery} on:input={filterJobs} />
     <select bind:value={filterCompany} on:change={filterJobs}>
-      <option value="">모든 회사</option>
+      <option value="">모든 공고</option>
       {#each [...new Set(jobListings.map(job => job.title))] as title}
         <option value={title}>{title}</option>
       {/each}

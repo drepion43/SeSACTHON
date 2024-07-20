@@ -3,7 +3,6 @@
   import { navigate } from 'svelte-routing'; // 라우터 임포트
   import Navbar from '../../components/Navbar.svelte';
   import { user, userType } from '../../lib/store';
-  import JobDetail from './JobDetail.svelte';
 
   let currentUser;
   let currentUserType;
@@ -17,42 +16,41 @@
   // });
   currentUser = 'bbbbb';
 
-  let jobListings = [];
-  let filteredJobListings = [];
+  let resumeListings = [];
+  let filteredResumeListings = [];
   let error = null;
-  let searchQuery = '';
-  let filterCompany = '';
 
-  async function fetchJobListings() {
+  async function fetchResumeListings() {
     try {
       const response = await fetch('http://localhost:8000/job_posting/all/');
+      // const response = await fetch('http://localhost:8000/resume/all/');
       if (!response.ok) {
         throw new Error('네트워크 응답이 실패했습니다');
       }
       const data = await response.json();
       // console.log(data)
-      if (!Array.isArray(data.jobPostings)) {
+      if (!Array.isArray(data.resumes)) {
         throw new Error('API 응답이 배열이 아닙니다.');
       }
-      jobListings = data.jobPostings;
-      filterJobs();
+      resumeListings = data.resumes;
+      filterResumes();
       console.log('user : ', currentUser);
-      console.log('job', filteredJobListings);
+      console.log('resume : ', filteredResumeListings);
     } catch (err) {
       error = err.message;
     }
   }
-  function filterJobs() {
-    filteredJobListings = jobListings.filter(job => {
-      const matchesUser = job.userId === currentUser;
-      console.log(`Job userID: ${job.userId}, Current userID: ${currentUser}, Matches: ${matchesUser}`);
+  function filterResumes() {
+    filteredResumeListings = resumeListings.filter(resume => {
+      const matchesUser = resume.userId === currentUser;
+      console.log(`resume userID: ${resume.userId}, Current userID: ${currentUser}, Matches: ${matchesUser}`);
       return matchesUser;
     });
   }
 
-  onMount(fetchJobListings);
+  onMount(fetchResumeListings);
 
-  function selectJob(job) {
+  function selectResume(job) {
     navigate(`/jobdetail/${job.id}`);
   }
 </script>
@@ -60,14 +58,14 @@
 
 <main class="container">
 <br><br><br><br>
-<h1>나의 채용 공고들</h1>
+<h1>{currentUser}의 지원한 공고</h1>
 {#if error}
   <p class="error">{error}</p>
 {:else}
   <ul class="job-list">
-    {#each filteredJobListings as job}
-      <li class="job-item" on:click={() => selectJob(job)}>
-        <h2>{job.title}</h2>
+    {#each filteredResumeListings as resume}
+      <li class="job-item" on:click={() => selectResume(resume)}>
+        <h2>{resume.title}</h2>
         <p><strong>설명:</strong> {job.description}</p>
       </li>
     {/each}

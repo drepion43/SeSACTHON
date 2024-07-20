@@ -146,80 +146,80 @@
   });
 
 
-  // let mediaRecorder;
-  // let audioBlob = null;
+  let mediaRecorder;
+  let audioBlob = null;
 
-  // // ===================전체 녹음=======================
-  // let totalaudioBlob = null;
-  // let isTotalRecording = false;
+  // ===================전체 녹음=======================
+  let totalaudioBlob = null;
+  let isTotalRecording = false;
 
-  // // 전체 녹음하기 -> audioBlob 생성
-  // async function totalRecording() {
-  //   try {
-  //     recordedChunks = [];
-  //     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  //     mediaRecorder = new MediaRecorder(stream);
+  // 전체 녹음하기 -> audioBlob 생성
+  async function totalRecording() {
+    try {
+      recordedChunks = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
 
-  //     mediaRecorder.ondataavailable = event => {
-  //       if (event.data.size > 0) {
-  //         recordedChunks.push(event.data);
-  //       }
-  //     };
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
 
-  //     mediaRecorder.onstop = () => {
-  //       audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-  //       console.log("Recording stopped, audioBlob created", audioBlob);
-  //     };
+      mediaRecorder.onstop = () => {
+        audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+        console.log("Recording stopped, audioBlob created", audioBlob);
+      };
 
-  //     mediaRecorder.start();
-  //     isTotalRecording = true;
-  //     console.log("Recording started");
-  //   } catch (err) {
-  //     console.error("Error accessing media devices.", err);
-  //     alertMessage = '오디오 장치를 사용할 수 없습니다. 권한을 확인하세요.';
-  //   }
-  // }
+      mediaRecorder.start();
+      isTotalRecording = true;
+      console.log("Recording started");
+    } catch (err) {
+      console.error("Error accessing media devices.", err);
+      alertMessage = '오디오 장치를 사용할 수 없습니다. 권한을 확인하세요.';
+    }
+  }
 
-  // function stopTotalRecording() {
-  //   mediaRecorder.stop();
-  //   isTotalRecording = false;
-  //   console.log("Recording stopped");
-  // }
+  function stopTotalRecording() {
+    mediaRecorder.stop();
+    isTotalRecording = false;
+    console.log("Recording stopped");
+  }
 
-  // function toggleTotalRecording() {
-  //   if (isTotalRecording) {
-  //     stopTotalRecording();
-  //   } else {
-  //     totalRecording();
-  //   }
-  // }
+  function toggleTotalRecording() {
+    if (isTotalRecording) {
+      stopTotalRecording();
+    } else {
+      totalRecording();
+    }
+  }
 
-  // // 녹음 파일 전송
-  // async function uploadTotalRecording() {
-  //   if (audioBlob) {
-  //     const formData = new FormData();
-  //     formData.append(job.id, 'user', audioBlob, 'recording.webm');
+  // 녹음 파일 전송
+  async function uploadTotalRecording() {
+    if (audioBlob) {
+      const formData = new FormData();
+      formData.append(job.id, 'user', audioBlob, 'recording.webm');
 
-  //     try {
-  //       const response = await fetch('http://localhost:8000/upload', {
-  //         method: 'POST',
-  //         body: formData,
-  //       });
+      try {
+        const response = await fetch('http://localhost:8000/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-  //       if (response.ok) {
-  //         alert('파일 업로드 성공');
-  //       } else {
-  //         throw new Error('파일 업로드 실패');
-  //       }
-  //     } catch (err) {
-  //       console.error('Error uploading file:', err);
-  //       alert('파일 업로드 중 오류가 발생했습니다.');
-  //     }
-  //   } else {
-  //     alert('녹음된 오디오가 없습니다.');
-  //   }
-  //   navigate('/home');
-  // }
+        if (response.ok) {
+          alert('파일 업로드 성공');
+        } else {
+          throw new Error('파일 업로드 실패');
+        }
+      } catch (err) {
+        console.error('Error uploading file:', err);
+        alert('파일 업로드 중 오류가 발생했습니다.');
+      }
+    } else {
+      alert('녹음된 오디오가 없습니다.');
+    }
+    navigate('/home');
+  }
 
   // 제출
   async function handleReumseSubmit() {
@@ -281,18 +281,17 @@ function updateAnswer(index, value) {
   <h4>(녹음 또는 직접 작성 해주세요.)</h4>
   <br><br>
   <h3>전체 녹음</h3>
-  <!-- <div>
+  <div>
     <button type="button" on:click={toggleTotalRecording} class="record-button">
       <i class="fas fa-microphone"></i> {#if isTotalRecording}녹음 중...{:else}녹음{/if}
     </button>
     <button type="button" on:click={uploadTotalRecording} class="upload-button">
       <i class="fas fa-upload"></i> 녹음 파일로 제출
     </button>
-  </div> -->
+  </div>
   <br><br>
   
   <form on:submit|preventDefault={handleReumseSubmit}>
-  <!-- <form> -->
     <fieldset>
       <label>이름</label>
       <input type="number" bind:value={userName}/>

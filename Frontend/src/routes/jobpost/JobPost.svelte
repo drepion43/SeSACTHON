@@ -49,7 +49,7 @@
     };
 
     try {
-      const response = await fetch('http://localhost:8000/job_posting/create/', {
+      const response = await fetch('http://localhost:8000/job_posting/job_posting/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
