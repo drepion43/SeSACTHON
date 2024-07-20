@@ -68,7 +68,7 @@
 
 
   // ===================== 지원자 정보 ==========================
-  let userID = '669a8ab590d4944b6b05df4b';
+  let userID = 'bbbbb';
 
   let userName = 'kim ha';
   let userAge = 0;
@@ -294,7 +294,7 @@ function updateAnswer(index, value) {
   <form on:submit|preventDefault={handleReumseSubmit}>
     <fieldset>
       <label>이름</label>
-      <input type="number" bind:value={userName}/>
+      <input type="text" bind:value={userName}/>
 
       <label>나이</label>
       <input type="number" bind:value={userAge} />

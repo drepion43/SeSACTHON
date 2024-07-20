@@ -1,15 +1,25 @@
 <script>
   import { navigate } from 'svelte-routing';
   import Navbar from '../components/Navbar.svelte';
+  import { user, userType } from '../lib/store';
 
 
-  let userId = '6695197b04cbd3e40f644197'; // 필요시 실제 유저 ID로 설정
+  let currentUser; // 필요시 실제 유저 ID로 설정
+  let currentUserType;
   let name = '';
   let birth = '';
   let gender = '';
   let skills = [];
   let careers = [];
   let alertMessage = '';
+
+  user.subscribe(value => {
+    currentUser = value;
+  });
+
+  userType.subscribe(value => {
+    currentUserType = value;
+  });
 
   // 기술 리스트에 추가 및 삭제
   function addSkill() {
@@ -33,7 +43,7 @@
       const timestamp = new Date().toISOString();
 
       const profileData = {
-          userId,
+          currentUser,
           name,
           birth,
           gender: parseInt(gender, 10),
@@ -44,7 +54,7 @@
       };
 
       try {
-          const response = await fetch('http://localhost:8000/profile/save/', {
+          const response = await fetch('http://localhost:8000/profile/save', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
