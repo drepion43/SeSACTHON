@@ -86,6 +86,11 @@
       alertMessage = `작성 실패: 서버 오류 - ${error.message}`;
     }
   }
+
+  function handleRadioChange(event) {
+    qualificationsRequired.gender = event.target.value;
+    console.log("Selected gender:", qualificationsRequired.gender);
+  }
 </script>
 
 <Navbar />
@@ -111,11 +116,13 @@
       <input type="number" bind:value={qualificationsRequired.ageMax} required />
 
       <label>성별</label>
-      <select bind:value={qualificationsRequired.gender} required>
-        <option value="" disabled selected>선택</option>
-        <option value="1">남성</option>
-        <option value="2">여성</option>
-      </select>
+      <div class="radio-group">
+        <label>남자<input type="radio" name="gender" value=1 on:change={handleRadioChange} />
+        </label>
+        <label>여자<input type="radio" name="gender" value=2 on:change={handleRadioChange} />
+        </label>
+      </div>
+
 
       <label>학력</label>
       <input type="text" bind:value={qualificationsRequired.customQualification.additionalProp1} required />
@@ -147,6 +154,15 @@
 
 
 <style>
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+    margin-left: 320px;
+  }
+
 .container {
     max-width: 800px;
     margin: 0 auto;

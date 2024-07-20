@@ -101,7 +101,7 @@
         <div class="radio-group">
           <label>남자<input type="radio" name="gender" value=1 on:change={handleRadioChange} />
           </label>
-          <label>여자<input type="radio" name="gender" value=0 on:change={handleRadioChange} />
+          <label>여자<input type="radio" name="gender" value=2 on:change={handleRadioChange} />
           </label>
         </div>
 
