@@ -10,13 +10,13 @@ pwd_contenxt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def create_user(user: UserModel) -> UserModel:
-    username = user.username
     user.password = pwd_contenxt.hash(user.password)
     new_user = await collection.insert_one(
         user.model_dump(by_alias=True, exclude=["id"])
     )
-    created_user = await collection.find_one({"username": username})
+    created_user = await collection.find_one({"_id": new_user.inserted_id})
     return created_user
+
 
 async def find_all_users():
     list_users = await collection.find().to_list(length=10)
@@ -24,6 +24,7 @@ async def find_all_users():
 
 
 async def find_user(username):
+    # user = await collection.find_one({"_id": ObjectId(user_id)})
     user = await collection.find_one({"username": username})
     user = UserModel(**user)
     return user

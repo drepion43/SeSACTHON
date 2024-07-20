@@ -12,9 +12,11 @@ router = APIRouter(prefix="/user")
 async def user_create(user: UserModel):
     return await create_user(user=user)
 
+
 @router.get("/all", response_model=UserCollection, response_model_by_alias=False)
 async def list_users():
     return await find_all_users()
+
 
 @router.get("/get/{username}", response_model=UserModel, response_model_by_alias=False)
 async def user_get(username: str):
