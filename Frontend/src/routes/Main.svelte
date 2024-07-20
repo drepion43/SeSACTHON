@@ -33,7 +33,7 @@ html, body {
 }
 
 .description {
-  font-size: 35px;
+  font-size: 70px;
 }
 
 .btn {
@@ -85,7 +85,7 @@ html, body {
 </style>
 <body>
 <div class="container">
-  <p class="description">채용 공고 홈페이지입니다.</p>
+  <p class="description">음성인식 채용 공고 홈페이지</p>
   <div class="button_container">
     <button class="btn" on:click={() => navigate('/login')}><span>Login</span></button>
     <button class="btn" on:click={() => navigate('/signup')}><span>Signup</span></button>

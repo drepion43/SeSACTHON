@@ -92,6 +92,18 @@
 
 <style>
   @import url('https://fonts.googleapis.com/css?family=Amatic+SC');
+  body {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(to top, #d9afd9 0%, #97d9e1 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
