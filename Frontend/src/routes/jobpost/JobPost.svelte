@@ -2,9 +2,11 @@
   import { navigate } from 'svelte-routing';
   import Navbar from '../../components/Navbar.svelte';
   import '@fortawesome/fontawesome-free/css/all.css';
+  import { user, userType } from '../../lib/store';
 
-  let userId = '669a2c8a92b008ad02bc3sfdjkls'; // 필요시 실제 유저 ID로 설정
 
+  let currentUser;
+  let currentUserType;
   let title = '';
   let description = '';
   
@@ -18,6 +20,17 @@
       additionalProp3: ''
     }
   };
+
+  // user 스토어 구독
+  user.subscribe(value => {
+    currentUser = value;
+  });
+
+  // userType 스토어 구독
+  userType.subscribe(value => {
+    currentUserType = value;
+  });
+
 
   let coverLetterQuestions = [];
 
@@ -37,19 +50,19 @@
   async function handleJobPosting() {
 
     const timestamp = new Date().toISOString();
-    console.log(coverLetterQuestions)
     const jobPostingData = {
-      userId,
-      title,
-      description,
-      qualificationsRequired,
-      coverLetterQuestions,
+      username: currentUser,
+      title: title,
+      description: description,
+      qualificationsRequired: qualificationsRequired,
+      coverLetterQuestions: coverLetterQuestions,
       createdAt: timestamp,
       updatedAt: timestamp
     };
+    console.log('final data', jobPostingData);
 
     try {
-      const response = await fetch('http://localhost:8000/job_posting/job_posting/', {
+      const response = await fetch('http://localhost:8000/job_posting/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +89,7 @@
         
         setTimeout(() => {
           alertMessage = '';
-          navigate('/'); // 변경된 경로 설정
+          navigate('/home'); // 변경된 경로 설정
         }, 2000); // 2초 후에 채용 공고 리스트 페이지로 이동
       } else {
         const result = await response.json();

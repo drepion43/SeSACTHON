@@ -40,23 +40,18 @@
   onMount(() => {
 
     // user 스토어 구독
-    const unsubscribeUser = user.subscribe(value => {
+    user.subscribe(value => {
       currentUser = value;
       fetchMyInfo();
     });
 
     // userType 스토어 구독
-    const unsubscribeUserType = userType.subscribe(value => {
+    userType.subscribe(value => {
       usergroup = value;
     });
 
     fetchMyInfo();
 
-    // 컴포넌트가 파괴될 때 구독 해제
-    return () => {
-      unsubscribeUser();
-      unsubscribeUserType();
-    };
   });
 
   // 계정 삭제

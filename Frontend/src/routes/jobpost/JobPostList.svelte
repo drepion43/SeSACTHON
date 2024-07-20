@@ -45,7 +45,7 @@
       
       filteredJobListings = jobListings.filter(job => {
       const matchesQuery = job.title.toLowerCase().includes(query) || job.description.toLowerCase().includes(query);
-      console.log(`Job userID: ${job.userID}, job title : ${job.title}`);
+      console.log(`Job username: ${job.username}, job title : ${job.title}`);
       return matchesQuery;
       });
     }

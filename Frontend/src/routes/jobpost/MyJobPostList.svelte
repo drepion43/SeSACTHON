@@ -8,20 +8,9 @@
   let currentUser;
   let currentUserType;
 
-  // user.subscribe(value => {
-  //   currentUser = value;
-  // });
-
-  // userType.subscribe(value => {
-  //   currentUserType = value;
-  // });
-  currentUser = 'bbbbb';
-
   let jobListings = [];
   let filteredJobListings = [];
   let error = null;
-  let searchQuery = '';
-  let filterCompany = '';
 
   async function fetchJobListings() {
     try {
@@ -44,16 +33,34 @@
   }
   function filterJobs() {
     filteredJobListings = jobListings.filter(job => {
-      const matchesUser = job.userId === currentUser;
-      console.log(`Job userID: ${job.userId}, Current userID: ${currentUser}, Matches: ${matchesUser}`);
+      const matchesUser = job.username === currentUser;
+      console.log(`Job username: ${job.username}, Current userID: ${currentUser}, Matches: ${matchesUser}`);
       return matchesUser;
     });
   }
 
-  onMount(fetchJobListings);
+  onMount(() => {
+    try{
+        // user 스토어 구독
+      user.subscribe(value => {
+        currentUser = value;
+      });
+
+      // userType 스토어 구독
+      userType.subscribe(value => {
+        currentUserType = value;
+      });
+
+      fetchJobListings();
+
+    } catch (err) {
+      error = err.message;
+      console.log(error);
+    }
+  });
 
   function selectJob(job) {
-    navigate(`/jobdetail/${job.id}`);
+      navigate(`/applyuserlist/${job.id}`);
   }
 </script>
 <Navbar />

@@ -3,15 +3,12 @@
   import { navigate, Link } from 'svelte-routing';
   import Navbar from '../../components/Navbar.svelte';
   import '@fortawesome/fontawesome-free/css/all.css';
-  import { userType } from '../../lib/store';
+  import { user, userType } from '../../lib/store';
 
   const timestamp = new Date().toISOString();
 
   let currentUserType;
-
-  userType.subscribe(value => {
-    currentUserType = value;
-  });
+  let currentUser;
 
   function getIdFromPath() {
     const path = window.location.pathname;
@@ -46,7 +43,7 @@
         throw new Error('네트워크 응답이 실패했습니다');
       }
       job = await response.json();
-      console.log('job ',job);
+      // console.log('job ',job);
       title = job.title;
       description = job.description;
       ageMin = job.qualificationsRequired.ageMin;
@@ -58,7 +55,7 @@
       coverLetterQuestions = job.coverLetterQuestions;
       initializeUserAnswers();
 
-      console.log('job title',coverLetterQuestions);
+      // console.log('job title',coverLetterQuestions);
 
     } catch (err) {
       error = err.message;
@@ -68,17 +65,17 @@
 
 
   // ===================== 지원자 정보 ==========================
-  let userID = 'bbbbb';
-
-  let userName = 'kim ha';
-  let userAge = 0;
+  let userName = '';
   let userBirth = '';
-  let userGender = 0;
+  let userGender = 1;
   let userProp1 = '';
   let userProp2 = '';
   let userProp3 = '';
   let userSkills = [];
   let userCareers = [];
+
+  let profileLists = [];
+  let filterprofileLists = [];
 
 
   let userCoverLetters = [];
@@ -88,53 +85,78 @@
       questionId: question.coverLetterQuestionId,
       answer: ''
     }));
-    console.log('Initialized userCoverLetters:', userCoverLetters); // 콘솔 로그로 초기화 확인
+    // console.log('Initialized userCoverLetters:', userCoverLetters); // 콘솔 로그로 초기화 확인
   }
   let alertMessage = '';
 
 
-  //   // 지원자의 정보 가져오기
-  // async function fetchUserProfile(id) {
-  //   try {
-  //     const response = await fetch(`http://localhost:8000/job_posting/detail/${id}`);
-  //     if (!response.ok) {
-  //       throw new Error('네트워크 응답이 실패했습니다');
-  //     }
-  //     job = await response.json();
-  //     console.log('job ',job);
-  //     title = job.title;
-  //     description = job.description;
-  //     ageMin = job.qualificationsRequired.ageMin;
-  //     ageMax = job.qualificationsRequired.ageMax;
-  //     createdAt = job.createdAt;
-  //     additionalProp1 = job.qualificationsRequired.customQualification.additionalProp1;
-  //     additionalProp2 = job.qualificationsRequired.customQualification.additionalProp2;
-  //     additionalProp3 = job.qualificationsRequired.customQualification.additionalProp3;
-  //     coverLetterQuestions = job.coverLetterQuestions;
+  // 지원자의 정보 가져오기
+  async function fetchUserProfile() {
+    try {
+      const response = await fetch(`http://localhost:8000/profile/all`);
+      if (!response.ok) {
+        throw new Error('네트워크 응답이 실패했습니다');
+      }
+      const data = await response.json();
+      profileLists = data.profiles;
 
-  //     console.log('job title',title);
+      filterUserProfile();
+      console.log('profile',filterprofileLists[0]);
 
-  //   } catch (err) {
-  //     error = err.message;
-  //     console.log(error);
-  //   }
-  // }
+      userName = filterprofileLists[0].name;
+      userBirth = formatDate(filterprofileLists[0].birth);
+      userGender = filterprofileLists[0].gender;
+      userSkills = filterprofileLists[0].skills;
+      // userCareers = filterprofileLists[0].careers;
+      userCareers = filterprofileLists[0].careers.map(career => ({
+        ...career,
+        startDate: formatDate(career.startDate),
+        endDate: formatDate(career.endDate)
+      }));
 
 
+    } catch (err) {
+      error = err.message;
+      console.log(error);
+    }
+  }
+  function filterUserProfile() {
+    filterprofileLists = profileLists.filter(profile => {
+      const matchesUser = profile.username === currentUser;
+      return matchesUser;
+    });
+  }
+
+  function formatDate(dateString) {
+    return dateString.split('T')[0];
+  }
+
+  
   function handleRadioChange(event) {
-    gender = event.target.value;
-    console.log("Selected gender:", gender);
+    userGender = event.target.value;
+    console.log("Selected gender:", userGender);
   }
 
   // 공고 정보 및 지원자 정보 가져오기
   onMount(() => {
     try{
+        // user 스토어 구독
+      user.subscribe(value => {
+        currentUser = value;
+      });
+
+      // userType 스토어 구독
+      userType.subscribe(value => {
+        currentUserType = value;
+      });
+
+
+      fetchUserProfile();
+
       jobid = getIdFromPath();
       if (jobid != null) {
-        console.log('Apply Get Job ID:', jobid);
         fetchJobDetail(jobid);
       }
-      console.log('question', coverLetterQuestions);
       // 지원자 정보
       // if (userid != null){
 
@@ -146,14 +168,14 @@
   });
 
 
-  let mediaRecorder;
-  let audioBlob = null;
+
 
   // ===================전체 녹음=======================
-  let totalaudioBlob = null;
+  let mp3Blob = null;
+  let mediaRecorder;
+  let recordedChunks = [];
   let isTotalRecording = false;
 
-  // 전체 녹음하기 -> audioBlob 생성
   async function totalRecording() {
     try {
       recordedChunks = [];
@@ -167,8 +189,9 @@
       };
 
       mediaRecorder.onstop = () => {
-        audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-        console.log("Recording stopped, audioBlob created", audioBlob);
+        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        convertToMP3(blob);
+        console.log("Recording stopped, audioBlob created");
       };
 
       mediaRecorder.start();
@@ -176,7 +199,6 @@
       console.log("Recording started");
     } catch (err) {
       console.error("Error accessing media devices.", err);
-      alertMessage = '오디오 장치를 사용할 수 없습니다. 권한을 확인하세요.';
     }
   }
 
@@ -194,14 +216,35 @@
     }
   }
 
-  // 녹음 파일 전송
-  async function uploadTotalRecording() {
-    if (audioBlob) {
+  async function convertToMP3(blob) {
+    const formData = new FormData();
+    formData.append('file', blob, 'recording.webm');
+
+    try {
+      const response = await fetch('http://localhost:8000/profile/get_webm', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        mp3Blob = await response.blob();
+        console.log('파일 변환 성공');
+      } else {
+        throw new Error('파일 변환 실패');
+      }
+    } catch (err) {
+      console.error('Error converting file:', err);
+    }
+  }
+
+  async function uploadMP3() {
+    if (mp3Blob) {
       const formData = new FormData();
-      formData.append(job.id, 'user', audioBlob, 'recording.webm');
+      formData.append('file', mp3Blob, 'recording.mp3');
+      formData.append('username', currentUser);
 
       try {
-        const response = await fetch('http://localhost:8000/upload', {
+        const response = await fetch('http://localhost:8000/profile/send_mp3', {
           method: 'POST',
           body: formData,
         });
@@ -216,7 +259,7 @@
         alert('파일 업로드 중 오류가 발생했습니다.');
       }
     } else {
-      alert('녹음된 오디오가 없습니다.');
+      alert('변환된 MP3 파일이 없습니다.');
     }
     navigate('/home');
   }
@@ -227,16 +270,16 @@
     const timestamp = new Date().toISOString();
     console.log('start submit', coverLetterQuestions);
     const resumeSubmitData = {
-      userID,
-      jobid,
-      userCoverLetters,
+      username: currentUser,
+      jobPostingId: jobid,
+      coverLetters: userCoverLetters,
       createdAt: timestamp,
       updatedAt: timestamp
     };
-    console.log("userID", userID);
-    console.log("jobid", jobid);
-    console.log("userCoverLetters", userCoverLetters);
-    console.log("Sucess", resumeSubmitData);
+    // console.log("userID", currentUser);
+    // console.log("jobid", jobid);
+    // console.log("userCoverLetters", userCoverLetters);
+    // console.log("Sucess", resumeSubmitData);
     initializeUserAnswers();
     try {
       const response = await fetch('http://localhost:8000/resume/create/', {
@@ -285,10 +328,20 @@ function updateAnswer(index, value) {
     <button type="button" on:click={toggleTotalRecording} class="record-button">
       <i class="fas fa-microphone"></i> {#if isTotalRecording}녹음 중...{:else}녹음{/if}
     </button>
-    <button type="button" on:click={uploadTotalRecording} class="upload-button">
-      <i class="fas fa-upload"></i> 녹음 파일로 제출
+    <button type="button" on:click={uploadMP3} class="upload-button">
+      <i class="fas fa-upload"></i> 서버로 업로드
     </button>
   </div>
+
+  {#if mp3Blob}
+    <div>
+      <h3>녹음된 파일:</h3>
+      <audio controls>
+        <source src={URL.createObjectURL(mp3Blob)} type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  {/if}
   <br><br>
   
   <form on:submit|preventDefault={handleReumseSubmit}>
@@ -296,18 +349,15 @@ function updateAnswer(index, value) {
       <label>이름</label>
       <input type="text" bind:value={userName}/>
 
-      <label>나이</label>
-      <input type="number" bind:value={userAge} />
-
       <label>
         생년월일:
         <input type="date" bind:value={userBirth} />
       </label>
 
       <div class="radio-group">
-        <label>남자<input type="radio" name="gender" value=1 on:change={handleRadioChange} />
+        <label>남자<input type="radio" name="userGender" value=1 bind:group={userGender} on:change={handleRadioChange} />
         </label>
-        <label>여자<input type="radio" name="gender" value=0 on:change={handleRadioChange} />
+        <label>여자<input type="radio" name="userGender" value=2 bind:group={userGender} on:change={handleRadioChange} />
         </label>
       </div>
 

@@ -10,12 +10,13 @@
     import JobPostList from './routes/jobpost/JobPostList.svelte';
     import JobPost from './routes/jobpost/JobPost.svelte';
     import JobDetail from './routes/jobpost/JobDetail.svelte';
-
-    import UserProfile from './routes/UserProfile.svelte';
-    import ApplyJob from './routes/applicant/ApplyJob.svelte';
+    import ApplyUserList from'./routes/jobpost/ApplyUserList.svelte';
     import MyJobPostList from'./routes/jobpost/MyJobPostList.svelte'
 
     import MyResume from'./routes/applicant/MyResume.svelte'
+    import ApplyJob from './routes/applicant/ApplyJob.svelte';
+
+    import UserProfile from './routes/UserProfile.svelte';
 
     import { isLoggedIn, userType } from './lib/store';
 
@@ -65,6 +66,7 @@
         <Route path="/jobdetail/:id" component={JobDetail} />
         <Route path="/myjobpostlist" component={MyJobPostList} />
         <Route path="/jobpost" component={JobPost} />
+        <Route path="/applyuserlist/:id" component={ApplyUserList} />
 
         
         <Route path="/profile" component={UserProfile} />

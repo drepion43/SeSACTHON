@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 
 
+
 class Career(BaseModel):
     startDate: datetime
     endDate: Union[datetime, None] = Field(default=None)
@@ -12,7 +13,7 @@ class Career(BaseModel):
 
 
 class ProfileModel(BaseModel):
-    userId: str
+    username: str   # pk처럼 사용
 
     name: str
     birth: datetime

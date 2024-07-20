@@ -7,23 +7,17 @@
   let currentUser;
   let currentUserType;
 
-  // user.subscribe(value => {
-  //   currentUser = value;
-  // });
 
-  // userType.subscribe(value => {
-  //   currentUserType = value;
-  // });
-  currentUser = 'bbbbb';
-
+ 
+  // =============== 이력서 정보 ===============================
   let resumeListings = [];
   let filteredResumeListings = [];
   let error = null;
+  let jobPostingID = [];
 
   async function fetchResumeListings() {
     try {
-      const response = await fetch('http://localhost:8000/job_posting/all/');
-      // const response = await fetch('http://localhost:8000/resume/all/');
+      const response = await fetch('http://localhost:8000/resume/all/');
       if (!response.ok) {
         throw new Error('네트워크 응답이 실패했습니다');
       }
@@ -33,26 +27,81 @@
         throw new Error('API 응답이 배열이 아닙니다.');
       }
       resumeListings = data.resumes;
+      console.log('job list : ',jobListings);
+      console.log('resume list : ',resumeListings);
+
       filterResumes();
-      console.log('user : ', currentUser);
-      console.log('resume : ', filteredResumeListings);
+      console.log('final resume : ',filteredResumeListings);
+
     } catch (err) {
       error = err.message;
     }
   }
   function filterResumes() {
-    filteredResumeListings = resumeListings.filter(resume => {
-      const matchesUser = resume.userId === currentUser;
-      console.log(`resume userID: ${resume.userId}, Current userID: ${currentUser}, Matches: ${matchesUser}`);
+    filteredResumeListings = resumeListings
+      .filter(resume => resume.username === currentUser)
+      .map(resume => {
+        const job = jobListings.find(job => job.id == resume.jobPostingId);
+        return { ...resume, job }; // 이력서와 관련된 job을 포함
+      });
+  }
+
+  // =============== 공고 정보 ===============================
+  let jobid = null;
+  let job = null;
+  let testid = '669bf2972ffd2cca659e62dd';
+  let testjob;
+
+  let jobListings = [];
+  let filteredJobListings = [];
+
+  async function fetchJobListings() {
+    try {
+      const response = await fetch('http://localhost:8000/job_posting/all/');
+      if (!response.ok) {
+        throw new Error('네트워크 응답이 실패했습니다');
+      }
+      const data = await response.json();
+      // console.log(data)
+      if (!Array.isArray(data.jobPostings)) {
+        throw new Error('API 응답이 배열이 아닙니다.');
+      }
+      jobListings = data.jobPostings;
+
+      console.log(`Job test: ${testjob}}`);
+    } catch (err) {
+      error = err.message;
+    }
+  }
+  function filterJobs(useid) {
+    filteredJobListings = jobListings.filter(job => {
+      const matchesUser = job.id === useid;
+      // console.log(`Job username: ${job.id}, Current userID: ${currentUser}, Matches: ${matchesUser}`);
       return matchesUser;
     });
+    return filteredJobListings;
   }
 
-  onMount(fetchResumeListings);
 
-  function selectResume(job) {
-    navigate(`/jobdetail/${job.id}`);
-  }
+
+  onMount(() => {
+
+    // user 스토어 구독
+    user.subscribe(value => {
+      currentUser = value;
+    });
+
+    // userType 스토어 구독
+    userType.subscribe(value => {
+      currentUserType = value;
+    });
+
+    fetchJobListings().then(() => {
+      fetchResumeListings();
+    });
+
+  });
+
 </script>
 <Navbar />
 
@@ -64,9 +113,27 @@
 {:else}
   <ul class="job-list">
     {#each filteredResumeListings as resume}
-      <li class="job-item" on:click={() => selectResume(resume)}>
-        <h2>{resume.title}</h2>
-        <p><strong>설명:</strong> {job.description}</p>
+      <li class="job-item">
+        <h2>{resume.job.title}</h2>
+        <p><strong>설명:</strong> {resume.job.description}</p>
+        <p><strong>나이제한:</strong> {resume.job.qualificationsRequired.ageMin} ~ {resume.job.qualificationsRequired.ageMax}</p>
+        <p><strong>성별:</strong> 
+          {#if resume.job.qualificationsRequired.gender == 0}남자 {/if}
+          {#if resume.job.qualificationsRequired.gender == 1}여자 {/if}
+        </p>
+        <br>
+        <p><strong>학력 요구사항:</strong> {resume.job.qualificationsRequired.customQualification.additionalProp1} 
+        </p>
+        <p><strong>자격증 요구사항:</strong> {resume.job.qualificationsRequired.customQualification.additionalProp2} 
+        </p>
+        <br>
+        {#each resume.job.coverLetterQuestions as q, index}
+          <p><strong>질문 {index + 1} : </strong>
+          {q.content}</p>
+          <p><strong>답변 : </strong>
+            {resume.coverLetters[index].answer}
+          </p>
+        {/each}
       </li>
     {/each}
   </ul>

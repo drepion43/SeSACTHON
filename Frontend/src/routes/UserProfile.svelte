@@ -43,16 +43,16 @@
       const timestamp = new Date().toISOString();
 
       const profileData = {
-          currentUser,
-          name,
-          birth,
+          username: currentUser,
+          name: name,
+          birth: birth,
           gender: parseInt(gender, 10),
-          skills,
-          careers,
+          skills: skills,
+          careers: careers,
           createdAt: timestamp,
           updatedAt: timestamp
       };
-
+      
       try {
           const response = await fetch('http://localhost:8000/profile/save', {
               method: 'POST',
@@ -65,18 +65,20 @@
           console.log(profileData);
 
           if (response.ok) {
-              alertMessage = '프로필이 성공적으로 작성되었습니다.';
-              // Clear form fields
-              name = '';
-              birth = '';
-              gender = '';
-              skills = [];
-              careers = [];
+            console.log('success');
 
-              setTimeout(() => {
-                  alertMessage = '';
-                  navigate('/home');
-              }, 2000); // 2초 후에 홈 페이지로 이동
+            alertMessage = '프로필이 성공적으로 작성되었습니다.';
+            // Clear form fields
+            name = '';
+            birth = '';
+            gender = '';
+            skills = [];
+            careers = [];
+
+            setTimeout(() => {
+                alertMessage = '';
+                navigate('/home');
+            }, 2000); // 2초 후에 홈 페이지로 이동
           } else {
               const result = await response.json();
               alertMessage = `작성 실패: ${result.detail}`;
@@ -85,6 +87,7 @@
           alertMessage = `작성 실패: 서버 오류 - ${error.message}`;
       }
   }
+
   function handleRadioChange(event) {
     gender = event.target.value;
     console.log("Selected gender:", gender);

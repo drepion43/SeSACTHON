@@ -59,15 +59,14 @@
   <div class="container">
     <p class="description">박 격 포</p>
     <p class="subdescription">사회적 약자를 위한 채용 플랫폼</p>
-
-    <p class="content">반갑습니다. {currentUser}
+    <p class="content">반갑습니다. </p>
+    <p class="content">{currentUser}
       {#if currentUserType == '1'}
         공고주님
       {/if}
       {#if currentUserType == '2'}
         지원자님
-      {/if}
-      </p>
+      {/if}</p>
 
 
 
